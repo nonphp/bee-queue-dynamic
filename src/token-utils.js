@@ -1,24 +1,26 @@
 import bigInt from 'big-integer'
 import objectHash from 'object-hash'
 
-export function payloadToToken(payload) {
-	return hashToToken(payloadToHash(payload))
+import { tokenSize } from './constants'
+
+export function payloadToToken(payload, algorithm) {
+	return hashToToken(payloadToHash(payload, algorithm))
 }
 
-export function payloadToHash(payload) {
+export function payloadToHash(payload, algorithm) {
 	return objectHash(payload, {
-		algorithm: 'md5',
+		algorithm,
 		encoding: 'hex',
 	})
 }
 
 export function hashToToken(hash) {
 	const num = bigInt(hash, 16)
-	const token = num.mod(256).toJSNumber()
+	const token = num.mod(tokenSize).toJSNumber()
 
 	return token
 }
 
 export function tokenToQueue(token, numQueues) {
-	return Math.floor((token / 256) * numQueues)
+	return Math.floor((token / tokenSize) * numQueues)
 }

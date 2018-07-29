@@ -4,18 +4,20 @@ import { randomBytes } from 'crypto'
 
 import Dynamic from '../src'
 
-describe.only('Dynamic Bee-Queue', () => {
+describe('Dynamic Bee-Queue', () => {
 	it('should distribute jobs evenly across queues', () => {
-		const queues = Array.from(Array(3)).map((v, i) => new Queue('queue-' + i))
+		const numQueues = 17
+		const maxJobs = 10 * 1000
 
-		const dynamicQueue = new Dynamic({
-			queues: queues.map(queue => ({ queue, weight: 100 })),
-		})
-
-		const maxJobs = 100 * 1000
+		const queues = Array.from(Array(numQueues)).map(
+			(v, i) => new Queue('queue-' + i),
+		)
+		const dynamicQueue = new Dynamic()
+		for (const queue of queues) {
+			dynamicQueue.registerQueue(queue)
+		}
 
 		const jobsPerQueue = {}
-
 		for (const queue of queues) {
 			jobsPerQueue[queue.name] = 0
 		}
@@ -28,7 +30,7 @@ describe.only('Dynamic Bee-Queue', () => {
 			jobsPerQueue[originalQueue]++
 		}
 
-		console.log(jobsPerQueue)
+		console.log('jobsPerQueue', jobsPerQueue)
 	}).timeout(60000)
 })
 

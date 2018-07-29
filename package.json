@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "eslint --fix src/. test/. --config .eslintrc.json",
-    "test": "NODE_ENV=test mocha -r @babel/register -r @babel/polyfill",
+    "test": "NODE_ENV=test mocha --exit -r @babel/register -r @babel/polyfill",
     "cov": "nyc mocha",
     "tdd": "yarn run test -w",
     "dev": "nodemon bin/nodemon --exec babel-node",

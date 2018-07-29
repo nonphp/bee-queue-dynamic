@@ -8,8 +8,7 @@ import {
 	tokenToQueue
 } from '../src/token-utils'
 
-const hashSize = 32 // sha-256
-const maxToken = 255
+import { defaultAlgorithm, hashSize, tokenSize } from '../src/constants'
 
 describe('Token Utils', () => {
 	describe('payloadToHash', () => {
@@ -18,7 +17,7 @@ describe('Token Utils', () => {
 
 			for (let i = 0; i < numTries; i++) {
 				const payload = makeRandomObject({ maxProps: 1, maxDepth: 1 })
-				const hash = payloadToHash(payload)
+				const hash = payloadToHash(payload, defaultAlgorithm)
 
 				assert.ok(typeof hash === 'string')
 				assert.ok(hash.length === hashSize * 2)
@@ -32,7 +31,7 @@ describe('Token Utils', () => {
 
 			for (let i = 0; i < numTries; i++) {
 				const payload = makeRandomObject({ maxProps: 1, maxDepth: 1 })
-				const token = payloadToToken(payload)
+				const token = payloadToToken(payload, defaultAlgorithm)
 
 				assert.ok(typeof token === 'number')
 			}
@@ -41,10 +40,10 @@ describe('Token Utils', () => {
 
 	describe('tokenToQueue', () => {
 		it('should map token to queue for any token', () => {
-			for (let numQueues = 1; numQueues <= maxToken; numQueues++) {
+			for (let numQueues = 1; numQueues < tokenSize; numQueues++) {
 				const hasToken = Array.from(Array(numQueues)).fill(false)
 				const numTokensPerQueue = Array.from(Array(numQueues)).fill(0)
-				for (let token = 0; token <= maxToken; token++) {
+				for (let token = 0; token < tokenSize; token++) {
 					const queueIndex = tokenToQueue(token, numQueues)
 
 					assert.ok(queueIndex <= numQueues - 1, 'queue index is out of bounds')
@@ -63,14 +62,14 @@ describe('Token Utils', () => {
 					'tokenToQueue is not equally distributed across queues',
 				)
 			}
-		})
+		}).timeout(60000)
 	})
 
 	describe('hashToToken', () => {
-		it('should return a number from 0 to 255 for any hash', () => {
-			const numTries = 100 * 1000
+		it('should return a number from 0 to tokenSize for any hash', () => {
+			const numTries = 250 * 1000
 			const hitsPerToken = {}
-			const onlyKeys = Array.from(Array(256)).map((v, i) => i)
+			const onlyKeys = Array.from(Array(tokenSize)).map((v, i) => i)
 
 			for (let i = 0; i < numTries; i++) {
 				const hash = randomBytes(hashSize).toString('hex')
@@ -79,7 +78,7 @@ describe('Token Utils', () => {
 				hitsPerToken[token] = true
 
 				assert.ok(token >= 0)
-				assert.ok(token <= maxToken)
+				assert.ok(token < tokenSize)
 			}
 
 			assert.deepStrictEqual(
@@ -91,8 +90,8 @@ describe('Token Utils', () => {
 		}).timeout(60000)
 
 		it('should distribute tokens evenly', () => {
-			const numTries = 1000 * 1000
-			const hitsPerToken = Array.from(Array(maxToken + 1)).fill(0)
+			const numTries = 100 * 1000
+			const hitsPerToken = Array.from(Array(tokenSize)).fill(0)
 			const numQueues = 107
 			const tokensPerQueue = Array.from(Array(numQueues)).fill(0)
 
@@ -112,23 +111,36 @@ describe('Token Utils', () => {
 
 			const avgMoveRange = avg(moveRange)
 			const avgHitsPerToken = avg(hitsPerToken)
-			const upperMoveBoundary = avgMoveRange * 3.267
 			const upperBoundary = avgHitsPerToken + avgMoveRange * 2.66
 			const lowerBoundary = avgHitsPerToken - avgMoveRange * 2.66
 
-			for (let i = 1; i < moveRange.length; i++) {
-				assert.ok(
-					moveRange[i] < upperMoveBoundary,
-					`value is out of bounds: token ${i + 1}, range ${moveRange[i]}`,
-				)
-				assert.ok(
-					moveRange[i] < upperBoundary,
-					`value is out of bounds: token ${i + 1}, range ${moveRange[i]}`,
-				)
-				assert.ok(
-					moveRange[i] > lowerBoundary,
-					`value is out of bounds: token ${i + 1}, range ${moveRange[i]}`,
-				)
+			const upperBoundaryThreshold = numTries / tokenSize / 2
+			const lowerBoundaryThreshold = numTries / tokenSize / 2
+
+			console.log('avgMoveRange', avgMoveRange)
+			console.log('avgHitsPerToken', avgHitsPerToken)
+			console.log('upperBoundary', upperBoundary)
+			console.log('upperBoundaryThreshold', upperBoundaryThreshold)
+			console.log('lowerBoundaryThreshold', lowerBoundaryThreshold)
+
+			for (let i = 0; i < hitsPerToken.length; i++) {
+				if (hitsPerToken[i] > upperBoundary) {
+					assert.ok(
+						Math.abs(upperBoundary - hitsPerToken[i]) <= upperBoundaryThreshold,
+						`number of hits strongly exceeds the upper boundary: token ${i}, hits ${
+							hitsPerToken[i]
+						}`,
+					)
+				}
+
+				if (hitsPerToken[i] < lowerBoundary) {
+					assert.ok(
+						Math.abs(hitsPerToken[i] - lowerBoundary) <= lowerBoundaryThreshold,
+						`number of hits strongly exceeds the lower boundary: token ${i}, hits ${
+							hitsPerToken[i]
+						}`,
+					)
+				}
 			}
 		}).timeout(60000)
 	})

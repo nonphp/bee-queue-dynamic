@@ -1,0 +1,13 @@
+{
+	"ignore": [".git", "node_modules", ".idea"],
+	"watch": ["src/", "config/", "package.json"],
+	"env": {
+		"NODE_ENV": "development",
+		"BABEL_DISABLE_CACHE": 1
+	},
+	"execMap": {
+		"js": "babel-node"
+	},
+	"signal": "SIGTERM",
+	"ext": "js json"
+}

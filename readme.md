@@ -1,7 +1,8 @@
 # bee-queue-dynamic
 
 This project helps distribute jobs evenly across multiple queues.
-It uses [object-hash] to compute hash of the job's payload and then transforms it into a number.
+
+It uses [object-hash](https://github.com/puleos/object-hash) to compute hash of the job's payload and then transforms it into a number.
 Then this number is transformed into a token by applying module operation (`token = hashVal % maxToken`).
 Tokens then used to decide on which queue to post the job (`queueIndex = token % amountOfQueues`).
 See [Example](#example) below for usage instructions.

@@ -7,11 +7,14 @@
     }]
   ],
   "plugins": [
-    ["module-resolver", {
-      "root": ["./src"],
-      "alias": {
-        "test": "./test"
+    "add-module-exports",
+    [
+      "module-resolver", {
+        "root": ["./src"],
+        "alias": {
+          "test": "./test"
+        }
       }
-    }]
+    ]
   ]
 }

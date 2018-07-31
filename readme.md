@@ -41,7 +41,7 @@ void (async function main() {
   // job will be created on one of the queues
   const job = await dynamic.createJob({ test: 'data' }).save()
 
-  console.log(job.queue.settings.host) // outputs one of: '0.0.0.1', '0.0.0.2'
+  console.log(job.queue.settings.redis.host) // outputs one of: '0.0.0.1', '0.0.0.2'
 })()
 ```
 

@@ -1,7 +1,5 @@
 # bee-queue-dynamic
 
-# Description
-
 This project helps distribute jobs evenly across multiple queues.
 It uses [object-hash] to compute hash of the job's payload and then transforms it into a number.
 Then this number is transformed into a token by applying module operation (`token = hashVal % maxToken`).

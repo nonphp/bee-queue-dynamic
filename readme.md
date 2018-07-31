@@ -48,7 +48,9 @@ void (async function main() {
 # FAQ
 
 Q: How much exactly even the distribution is?
-A: It depends on how different your job payloads are. This project has not been tested in any production environment yet. I will update this question once I do some actual tests.
+
+A: It depends on how different your job payloads are. This project has not been tested in any production environment yet. I will update this QA once I do some actual tests.
+
 Here is test results for distributing 100 000 fully random jobs across 17 queues:
 
 ```

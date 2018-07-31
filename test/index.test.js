@@ -1,5 +1,4 @@
 import Queue from 'bee-queue'
-import assert from 'assert'
 import { randomBytes } from 'crypto'
 
 import Dynamic from '../src'

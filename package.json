@@ -1,42 +1,45 @@
 {
-  "name": "bee-queue-dynamic",
-  "version": "0.0.1",
-  "main": "src/index.js",
-  "license": "MIT",
-  "engines": {
-    "node": "> 8.0.0"
-  },
-  "scripts": {
-    "lint": "eslint --fix src/. test/. --config .eslintrc.json",
-    "test": "NODE_ENV=test mocha --exit -r @babel/register -r @babel/polyfill",
-    "cov": "nyc mocha",
-    "tdd": "yarn run test -w",
-    "dev": "nodemon bin/nodemon --exec babel-node",
-    "pm2": "yarn run build; pm2 start process.yml --env production",
-    "build": "babel src/ -d dist/",
-    "prepublish": "yarn run build"
-  },
-  "dependencies": {
-    "bee-queue": "^1.2.2",
-    "big-integer": "^1.6.32",
-    "hashring": "^3.2.0",
-    "object-hash": "^1.3.0",
-    "simple-lru-cache": "^0.0.2"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.55",
-    "@babel/core": "^7.0.0-beta.55",
-    "@babel/node": "^7.0.0-beta.55",
-    "@babel/preset-env": "^7.0.0-beta.55",
-    "@babel/register": "^7.0.0-beta.55",
-    "babel-plugin-module-resolver": "^3.1.1",
-    "eslint": "^5.2.0",
-    "eslint-import-resolver-babel-module": "^5.0.0-beta.0",
-    "eslint-plugin-babel": "^5.1.0",
-    "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-node": "^7.0.1",
-    "mocha": "^5.2.0",
-    "nodemon": "^1.18.3",
-    "nyc": "^12.0.2"
-  }
+	"name": "bee-queue-dynamic",
+	"version": "0.0.2",
+	"main": "dist/index.js",
+	"files": [
+		"src",
+		"dist"
+	],
+	"license": "MIT",
+	"repository": "https://github.com/nonphp/bee-queue-dynamic",
+	"engines": {
+		"node": "> 8.0.0"
+	},
+	"scripts": {
+		"lint": "eslint --fix src/. test/. --config .eslintrc.json",
+		"test": "NODE_ENV=test mocha --exit -r @babel/register -r @babel/polyfill",
+		"cov": "nyc mocha",
+		"tdd": "yarn run test -w",
+		"dev": "nodemon bin/nodemon --exec babel-node",
+		"pm2": "yarn run build; pm2 start process.yml --env production",
+		"build": "rm -rf dist/*; babel src/ -d dist/",
+		"prepublish": "yarn run build"
+	},
+	"dependencies": {
+		"bee-queue": "^1.2.2",
+		"big-integer": "^1.6.32",
+		"object-hash": "^1.3.0"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.0.0-beta.55",
+		"@babel/core": "^7.0.0-beta.55",
+		"@babel/node": "^7.0.0-beta.55",
+		"@babel/preset-env": "^7.0.0-beta.55",
+		"@babel/register": "^7.0.0-beta.55",
+		"babel-plugin-module-resolver": "^3.1.1",
+		"eslint": "^5.2.0",
+		"eslint-import-resolver-babel-module": "^5.0.0-beta.0",
+		"eslint-plugin-babel": "^5.1.0",
+		"eslint-plugin-import": "^2.13.0",
+		"eslint-plugin-node": "^7.0.1",
+		"mocha": "^5.2.0",
+		"nodemon": "^1.18.3",
+		"nyc": "^12.0.2"
+	}
 }

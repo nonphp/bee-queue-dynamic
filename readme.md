@@ -6,6 +6,10 @@ It uses [object-hash](https://github.com/puleos/object-hash) to compute hash of 
 Then this number is transformed into a token by applying module operation (`token = hashVal % maxToken`).
 Tokens then used to decide on which queue to post the job (`queueIndex = token % amountOfQueues`).
 
+# Why?
+
+[Bee Queue](https://github.com/bee-queue/bee-queue) is amazing module. As for august 2018 it doesn't support redis cluster. So scaling queues on multiple servers requires synchronised redis instance. This is not as fast as using redis locally. You can set up multiple instances of your app to use different redis servers (available locally) and use this module to distribute jobs between them.
+
 # Usage
 
 ## new Dynamic([options])
@@ -13,14 +17,19 @@ Tokens then used to decide on which queue to post the job (`queueIndex = token %
 Create an instance of dynamic bee-queue wrapper
 
 - `options.algorithm`: algorithm to use for hashing. Defaults to `sha512`
+- `options.strategy`: strategy to use for job distribution. Can be `token` or `random`. Defaults to `token`
 
 ## dynamic.registerQueue(queue)
 
 Register queue to use with wrapper
 
+- `queue`: instance of [bee-queue](https://github.com/bee-queue/bee-queue)
+
 ## dynamic.unregisterQueue(queue)
 
-Unregister previously registered queue. This is useful in case if redis connection dies. The wrapper will continue to work with queues that have left. `queue` argument should be the same object that was used in `registerQueue`.
+Unregister previously registered queue. This is useful in case if redis connection dies. The wrapper will continue to work with queues that have left
+
+- `queue`: instance of [bee-queue](https://github.com/bee-queue/bee-queue). should be the same object that was used in `registerQueue`
 
 ## dynamic.createJob(data)
 

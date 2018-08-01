@@ -1,56 +1,76 @@
+import assert from 'assert'
 import Queue from 'bee-queue'
-import { randomBytes } from 'crypto'
 
 import Dynamic from '../src'
 
 describe('Dynamic Bee-Queue', () => {
-	it('should distribute jobs evenly across queues', () => {
-		const numQueues = 17
-		const maxJobs = 10 * 1000
+	it('should throw an error if invalid strategy specified', () => {
+		assert.throws(() => {
+			new Dynamic({ strategy: 'invalid' })
+		}, /invalid strategy: invalid/)
+	})
 
-		const queues = Array.from(Array(numQueues)).map(
-			(v, i) => new Queue('queue-' + i),
-		)
-		const dynamicQueue = new Dynamic()
-		for (const queue of queues) {
-			dynamicQueue.registerQueue(queue)
-		}
+	it('should be able to add queue using "registerQueue" method', () => {
+		const dynamic = new Dynamic()
+		const queues = dynamic._queues
+		const queue = new Queue('test')
 
-		const jobsPerQueue = {}
-		for (const queue of queues) {
-			jobsPerQueue[queue.name] = 0
-		}
+		dynamic.registerQueue(queue)
 
-		for (let i = 0; i < maxJobs; i++) {
-			const payload = makeRandomObject({ maxProps: 2 })
-			const job = dynamicQueue.createJob(payload)
+		assert.strictEqual(queues.length, 1)
+		assert.strictEqual(queues[0], queue)
+	})
 
-			const originalQueue = job.queue.name
-			jobsPerQueue[originalQueue]++
-		}
+	it('should throw an error if invalid object is passed in "registerQueue" method', () => {
+		const dynamic = new Dynamic()
 
-		console.log('jobsPerQueue', jobsPerQueue)
-	}).timeout(60000)
+		assert.throws(() => {
+			dynamic.registerQueue({})
+		}, /invalid queue/)
+	})
+
+	it('should be able to unregister queue using "unregisterQueue" method', () => {
+		const dynamic = new Dynamic()
+		const queues = dynamic._queues
+		const queue1 = new Queue('test')
+		const queue2 = new Queue('test')
+		const queue3 = new Queue('test')
+
+		dynamic.registerQueue(queue1)
+		dynamic.registerQueue(queue2)
+		dynamic.registerQueue(queue3)
+
+		assert.strictEqual(queues.length, 3)
+
+		dynamic.unregisterQueue(queue2)
+
+		assert.strictEqual(queues.length, 2)
+		assert.strictEqual(queues[0], queue1)
+		assert.strictEqual(queues[1], queue3)
+	})
+
+	it('should not do anything if unknown queue is passed in "unregisterQueue" method', () => {
+		const dynamic = new Dynamic()
+		const queues = dynamic._queues
+		const queue1 = new Queue('test')
+		const queue2 = new Queue('test')
+
+		dynamic.registerQueue(queue1)
+
+		assert.strictEqual(queues.length, 1)
+		assert.strictEqual(queues[0], queue1)
+
+		dynamic.unregisterQueue(queue2)
+
+		assert.strictEqual(queues.length, 1)
+		assert.strictEqual(queues[0], queue1)
+	})
+
+	it('should throw an error if no queues are present during "createJob" call', () => {
+		const dynamic = new Dynamic()
+
+		assert.throws(() => {
+			dynamic.createJob({})
+		}, /Dynamic queue wrapper has no queues/)
+	})
 })
-
-function makeRandomObject({ maxProps = 5, maxDepth = 3, depth }) {
-	const res = {}
-
-	const numProps = Math.floor(Math.random() * maxProps) + 1
-
-	if (typeof depth === 'undefined') {
-		depth = Math.floor(Math.random() * maxDepth) + 1
-	}
-
-	for (let i = 0; i < numProps; i++) {
-		const prop = randomBytes(8).toString('hex')
-
-		if (depth > 0) {
-			res[prop] = makeRandomObject({ maxProps, depth: depth - 1 })
-		} else {
-			res[prop] = randomBytes(8).toString('hex')
-		}
-	}
-
-	return res
-}

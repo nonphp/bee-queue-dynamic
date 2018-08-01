@@ -6,9 +6,9 @@ import {
 	payloadToHash,
 	hashToToken,
 	tokenToQueue
-} from '../src/token-utils'
+} from 'common/token-utils'
 
-import { defaultAlgorithm, hashSize, tokenSize } from '../src/constants'
+import { defaultAlgorithm, hashSize, tokenSize } from 'common/constants'
 
 describe('Token Utils', () => {
 	describe('payloadToHash', () => {
@@ -67,7 +67,7 @@ describe('Token Utils', () => {
 
 	describe('hashToToken', () => {
 		it('should return a number from 0 to tokenSize for any hash', () => {
-			const numTries = 250 * 1000
+			const numTries = tokenSize * 25
 			const hitsPerToken = {}
 			const onlyKeys = Array.from(Array(tokenSize)).map((v, i) => i)
 

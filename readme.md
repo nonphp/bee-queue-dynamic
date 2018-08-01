@@ -5,7 +5,26 @@ This project helps distribute jobs evenly across multiple queues.
 It uses [object-hash](https://github.com/puleos/object-hash) to compute hash of the job's payload and then transforms it into a number.
 Then this number is transformed into a token by applying module operation (`token = hashVal % maxToken`).
 Tokens then used to decide on which queue to post the job (`queueIndex = token % amountOfQueues`).
-See [Example](#example) below for usage instructions.
+
+# Usage
+
+## new Dynamic([options])
+
+Create an instance of dynamic bee-queue wrapper
+
+- `options.algorithm`: algorithm to use for hashing. Defaults to `sha512`
+
+## dynamic.registerQueue(queue)
+
+Register queue to use with wrapper
+
+## dynamic.unregisterQueue(queue)
+
+Unregister previously registered queue. This is useful in case if redis connection dies. The wrapper will continue to work with queues that have left. `queue` argument should be the same object that was used in `registerQueue`.
+
+## dynamic.createJob(data)
+
+Create new job on one of registered queues. This will throw an error if no queues are present.
 
 # Example
 
